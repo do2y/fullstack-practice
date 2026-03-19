@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>충정일보</title>
+    <link rel="stylesheet" href="/public/style.css" />
+    <script src="/public/script.js" defer></script>
+  </head>
+
+  <body>
+    <div class="container">
+      <header>충정일보</header>
+
+      <div class="main" id="news-list"></div>
+
+      <div class="sidebar">
+        <h3>Trend</h3>
+        <p>#정치</p>
+        <p>#경제</p>
+        <p>#연예</p>
+      </div>
+
+      <div class="form-container">
+        <h3>기사 작성</h3>
+        <input type="text" id="title" placeholder="제목" />
+        <input type="text" id="category" placeholder="카테고리" />
+        <input type="text" id="author" placeholder="기자 이름" />
+        <textarea id="content" placeholder="본문"></textarea>
+        <button onclick="submitNews()">등록</button>
+      </div>
+    </div>
+  </body>
+</html>
