@@ -50,6 +50,19 @@ app.post("/api/news", async (req, res) => {
   }
 });
 
+app.get("/api/news/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const [rows] = await pool.query("SELECT * FROM news WHERE id = ?", [id]);
+
+    res.json(rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "error" });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`http://localhost:${PORT}`);
 });

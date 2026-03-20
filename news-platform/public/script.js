@@ -1,57 +1,49 @@
-const express = require("express");
-const mysql = require("mysql2/promise");
-const cors = require("cors");
-const path = require("path");
-require("dotenv").config();
-
-const app = express();
-const PORT = 3000;
-
-app.use(cors());
-app.use(express.json());
-app.use("/public", express.static(path.join(__dirname, "public")));
-
-const pool = mysql.createPool({
-  host: process.env.DB_HOST || "localhost",
-  user: process.env.DB_USER || "root",
-  password: process.env.DB_PASSWORD || "",
-  database: process.env.DB_NAME || "news_db",
-  waitForConnections: true,
-  connectionLimit: 5,
-});
-
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "templates", "index.html"));
-});
-
-app.get("/api/news", async (req, res) => {
+async function loadNews() {
   try {
-    const [rows] = await pool.query(
-      "SELECT id, title, category, author FROM news ORDER BY id DESC",
-    );
-    res.json(rows);
+    const res = await fetch("/api/news");
+    const data = await res.json();
+
+    const container = document.getElementById("news-list");
+
+    container.innerHTML = data
+      .map(
+        (news) => `
+        <div class="news-item">
+          <h3>${news.title}</h3>
+          <p>${news.category} | ${news.author}</p>
+        </div>
+      `,
+      )
+      .join("");
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "error" });
   }
-});
+}
 
-app.post("/api/news", async (req, res) => {
-  try {
-    const { title, category, content, author } = req.body;
+async function submitNews() {
+  const title = document.getElementById("title").value;
+  const category = document.getElementById("category").value;
+  const author = document.getElementById("author").value;
+  const content = document.getElementById("content").value;
 
-    const [result] = await pool.query(
-      "INSERT INTO news (title, category, content, author) VALUES (?, ?, ?, ?)",
-      [title, category, content, author],
-    );
+  await fetch("/api/news", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ title, category, content, author }),
+  });
 
-    res.json({ id: result.insertId });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "error" });
-  }
-});
+  loadNews();
+}
 
-app.listen(PORT, () => {
-  console.log(`http://localhost:${PORT}`);
-});
+// 모달 열기
+function openForm() {
+  document.getElementById("form-modal").classList.remove("hidden");
+}
+
+// 모달 닫기
+function closeForm() {
+  document.getElementById("form-modal").classList.add("hidden");
+}
+loadNews();
